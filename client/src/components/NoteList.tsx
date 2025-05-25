@@ -79,7 +79,7 @@ function NoteList() {
   };
 
   const saveEdit = async (id: string) => {
-    if (editingTitle.trim()) {
+    if (!(editingTitle.trim().length === 0)) {
       await updateNoteService(id, editingTitle);
       setEditingId(null);
       setEditingTitle("");
