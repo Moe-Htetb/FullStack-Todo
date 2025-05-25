@@ -55,6 +55,7 @@ function NoteList() {
       }).then((result) => {
         if (result.isConfirmed) {
           deleteNoteService(id);
+          makeRefresh();
 
           Swal.fire({
             title: "Deleted!",
@@ -64,7 +65,6 @@ function NoteList() {
           });
         }
       });
-      makeRefresh();
     } catch (error) {
       throw new Error("Failed to delete data.");
     }
@@ -121,7 +121,7 @@ function NoteList() {
               <div className="flex items-center gap-2">
                 {editingId === _id ? (
                   <input
-                    className="border border-black px-2 py-1 text-black rounded"
+                    className="border border-black focus:outline-0 px-2 py-1 text-black rounded"
                     value={editingTitle}
                     autoFocus
                     onChange={(e) => setEditingTitle(e.target.value)}
