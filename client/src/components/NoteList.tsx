@@ -45,10 +45,9 @@ function NoteList() {
       console.error("Failed to create note.");
     }
   };
-
   const onDeleteHandler = async (id: string) => {
     try {
-      await Swal.fire({
+      const result = await Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
         icon: "warning",
@@ -56,18 +55,19 @@ function NoteList() {
         confirmButtonColor: "black",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          deleteNoteService(id);
-          makeRefresh();
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your note has been deleted.",
-            icon: "success",
-            confirmButtonColor: "black",
-          });
-        }
       });
+
+      if (result.isConfirmed) {
+        await deleteNoteService(id);
+        makeRefresh();
+
+        await Swal.fire({
+          title: "Deleted!",
+          text: "Your note has been deleted.",
+          icon: "success",
+          confirmButtonColor: "black",
+        });
+      }
     } catch (error) {
       console.error("Delete failed");
     }
