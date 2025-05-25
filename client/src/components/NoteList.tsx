@@ -55,7 +55,7 @@ function NoteList() {
       }).then((result) => {
         if (result.isConfirmed) {
           deleteNoteService(id);
-          makeRefresh();
+
           Swal.fire({
             title: "Deleted!",
             text: "Your file has been deleted.",
@@ -64,6 +64,7 @@ function NoteList() {
           });
         }
       });
+      makeRefresh();
     } catch (error) {
       throw new Error("Failed to delete data.");
     }
