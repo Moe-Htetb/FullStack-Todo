@@ -10,9 +10,9 @@ import {
 const router = Router();
 
 router.post("/create", createTodos);
-router.get("/getTodos", getTodos);
-router.get("/getTodo/:todoId", getTodo);
-router.delete("/delete/:todoId", deleteTodo);
-router.put("/update/:todoId", updateTodo);
+router.get("/todos", getTodos);
+router.get("/todos/:todoId", getTodo);
+router.delete("/todos/:todoId", deleteTodo);
+router.put("/todos/:todoId", updateTodo);
 
 export default router;

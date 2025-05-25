@@ -15,7 +15,7 @@ export const createTodos = async (req: Request, res: Response) => {
 export const getTodos = async (req: Request, res: Response) => {
   const newTodo = await Todos.find();
   try {
-    res.status(200).json({ message: "All todos fetched", todo: newTodo });
+    res.status(200).json({ message: "All todos fetched", todos: newTodo });
   } catch (error) {
     console.log("getTodos controller error" + error);
   }
