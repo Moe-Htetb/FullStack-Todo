@@ -4,7 +4,7 @@ import {
   getNotes,
   createNoteService,
   deleteNoteService,
-  updateNoteService, // ✅ Add this import
+  updateNoteService,
 } from "../services/NoteService";
 import { Pencil, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
@@ -15,14 +15,18 @@ function NoteList() {
   const [refresh, setRefresh] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // ✅ Spinner starts ON when render
 
   useEffect(() => {
     const fetchNotes = async () => {
+      setIsLoading(true); // ✅ show spinner when page loads
       try {
         const data = await getNotes();
         setNotes(data);
       } catch (error) {
-        throw new Error("Failed to fetch data.");
+        console.error("Failed to fetch data.");
+      } finally {
+        setIsLoading(false); // ✅ hide spinner after data fetch
       }
     };
     fetchNotes();
@@ -32,13 +36,13 @@ function NoteList() {
 
   const createNote = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (msg.trim().length === 0) return;
     try {
-      if (msg.trim().length === 0) return;
       await createNoteService(msg);
-      makeRefresh();
       setMsg("");
+      makeRefresh();
     } catch (error) {
-      console.error("Failed to add note.");
+      console.error("Failed to create note.");
     }
   };
 
@@ -56,17 +60,16 @@ function NoteList() {
         if (result.isConfirmed) {
           deleteNoteService(id);
           makeRefresh();
-
           Swal.fire({
             title: "Deleted!",
-            text: "Your file has been deleted.",
+            text: "Your note has been deleted.",
             icon: "success",
             confirmButtonColor: "black",
           });
         }
       });
     } catch (error) {
-      throw new Error("Failed to delete data.");
+      console.error("Delete failed");
     }
   };
 
@@ -112,49 +115,54 @@ function NoteList() {
           </span>
         </div>
 
-        <ul className="space-y-2">
-          {Notes.map(({ title, _id }) => (
-            <li
-              key={_id}
-              className="flex items-center justify-between border border-black p-3 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                {editingId === _id ? (
-                  <input
-                    className="border border-black focus:outline-0 px-2 py-1 text-black rounded"
-                    value={editingTitle}
-                    autoFocus
-                    onChange={(e) => setEditingTitle(e.target.value)}
-                    onBlur={() => saveEdit(_id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        saveEdit(_id);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-md text-black">{title}</span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  className="border border-black p-2 rounded cursor-pointer"
-                  onClick={() => handleEdit(_id, title)} // ✅ Start editing
-                >
-                  <Pencil size={16} className="text-black" />
-                </button>
-                <button className="border border-black p-2 rounded cursor-pointer">
-                  <Trash2
-                    size={16}
-                    className="text-black"
+        {isLoading ? (
+          <div className="flex justify-center py-6">
+            <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {Notes.map(({ title, _id }) => (
+              <li
+                key={_id}
+                className="flex items-center justify-between border border-black p-3 rounded-md"
+              >
+                <div className="flex items-center gap-2">
+                  {editingId === _id ? (
+                    <input
+                      className="border border-black focus:outline-0 px-2 py-1 text-black rounded"
+                      value={editingTitle}
+                      autoFocus
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                      onBlur={() => saveEdit(_id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          saveEdit(_id);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <span className="text-md text-black">{title}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="border border-black p-2 rounded cursor-pointer"
+                    onClick={() => handleEdit(_id, title)}
+                  >
+                    <Pencil size={16} className="text-black" />
+                  </button>
+                  <button
+                    className="border border-black p-2 rounded cursor-pointer"
                     onClick={() => onDeleteHandler(_id)}
-                  />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  >
+                    <Trash2 size={16} className="text-black" />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
