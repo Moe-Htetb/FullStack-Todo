@@ -5,6 +5,10 @@ const todoSchema = new Schema({
     type: String,
     require: true,
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "Users",
+  },
 });
 
 export const Todos = mongoose.model("Todos", todoSchema);

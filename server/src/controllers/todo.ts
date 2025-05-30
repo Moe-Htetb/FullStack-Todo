@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { Todos } from "../models/Todos";
+import { authRequest } from "../middleware/authMiddleware";
 
-export const createTodos = async (req: Request, res: Response) => {
+export const createTodos = async (req: authRequest, res: Response) => {
   const { title } = req.body;
+  const userId = req.user?._id;
   try {
-    const newTodo = await Todos.create({ title });
+    const newTodo = await Todos.create({ title, userId });
 
     res.status(200).json({ message: "New Todo Added", todo: newTodo });
   } catch (error) {

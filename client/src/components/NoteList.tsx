@@ -8,6 +8,9 @@ import {
 } from "../services/NoteService";
 import { Pencil, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store";
+import { Link } from "react-router";
 
 function NoteList() {
   const [Notes, setNotes] = useState<NoteType[]>([]);
@@ -15,18 +18,18 @@ function NoteList() {
   const [refresh, setRefresh] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // ✅ Spinner starts ON when render
-
+  const [isLoading, setIsLoading] = useState(true);
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
   useEffect(() => {
     const fetchNotes = async () => {
-      setIsLoading(true); // ✅ show spinner when page loads
+      setIsLoading(true);
       try {
         const data = await getNotes();
         setNotes(data);
       } catch (error) {
         console.error("Failed to fetch data.");
       } finally {
-        setIsLoading(false); // ✅ hide spinner after data fetch
+        setIsLoading(false);
       }
     };
     fetchNotes();
@@ -88,25 +91,41 @@ function NoteList() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className=" flex items-center justify-center  bg-gray-100 px-4 mt-40 md:mt-30">
       <div className="bg-white p-6 rounded-md w-full max-w-md shadow-md border border-black">
         <h1 className="text-3xl font-bold mb-4">Note Lists</h1>
 
-        <form onSubmit={createNote} className="flex mb-6 border border-black">
-          <input
-            type="text"
-            className="flex-1 p-2 outline-none text-black"
-            placeholder="Add new Note"
-            value={msg}
-            onChange={(e) => setMsg(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="w-12 bg-black text-white text-xl flex items-center justify-center"
-          >
-            +
-          </button>
-        </form>
+        <>
+          {userInfo ? (
+            <form
+              onSubmit={createNote}
+              className="flex mb-6 border border-black"
+            >
+              <input
+                type="text"
+                className="flex-1 p-2 outline-none text-black"
+                placeholder="Add new Note"
+                value={msg}
+                onChange={(e) => setMsg(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="w-12 bg-black text-white text-xl flex items-center justify-center"
+              >
+                +
+              </button>
+            </form>
+          ) : (
+            <div className="flex mb-6 justify-center items-center">
+              <p className=" text-red-500 font-semibold mb-6  text-2xl">
+                <Link to="/login" className="underline cursor-pointer mr-1">
+                  Login
+                </Link>
+                to note
+              </p>
+            </div>
+          )}
+        </>
 
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold">Your List</h2>
@@ -121,7 +140,7 @@ function NoteList() {
           </div>
         ) : (
           <ul className="space-y-2">
-            {Notes.map(({ title, _id }) => (
+            {Notes.map(({ title, _id, userId }) => (
               <li
                 key={_id}
                 className="flex items-center justify-between border border-black p-3 rounded-md"
@@ -145,20 +164,22 @@ function NoteList() {
                     <span className="text-md text-black">{title}</span>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    className="border border-black p-2 rounded cursor-pointer"
-                    onClick={() => handleEdit(_id, title)}
-                  >
-                    <Pencil size={16} className="text-black" />
-                  </button>
-                  <button
-                    className="border border-black p-2 rounded cursor-pointer"
-                    onClick={() => onDeleteHandler(_id)}
-                  >
-                    <Trash2 size={16} className="text-black" />
-                  </button>
-                </div>
+                {userId === userInfo?._id && (
+                  <div className="flex gap-2">
+                    <button
+                      className="border border-black p-2 rounded cursor-pointer"
+                      onClick={() => handleEdit(_id, title)}
+                    >
+                      <Pencil size={16} className="text-black" />
+                    </button>
+                    <button
+                      className="border border-black p-2 rounded cursor-pointer"
+                      onClick={() => onDeleteHandler(_id)}
+                    >
+                      <Trash2 size={16} className="text-black" />
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

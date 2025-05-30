@@ -19,7 +19,7 @@ if (import.meta.env.VITE_MODE === "production") {
 //   });
 // };
 export const createNoteService = async (title: string) => {
-  await axios.post(`${Api_URL}/create`, { title });
+  await axios.post(`${Api_URL}/create`, { title }, { withCredentials: true });
 };
 
 // export const getNotes = async (): Promise<NoteType[]> => {
@@ -44,9 +44,13 @@ export const getNotes = async (): Promise<NoteType[]> => {
 //   });
 // };
 export const updateNoteService = async (id: string, title: string) => {
-  await axios.put(`${Api_URL}/todos/${id}`, { title });
+  await axios.put(
+    `${Api_URL}/todos/${id}`,
+    { title },
+    { withCredentials: true }
+  );
 };
 
 export const deleteNoteService = async (id: string) => {
-  await axios.delete(`${Api_URL}/todos/${id}`);
+  await axios.delete(`${Api_URL}/todos/${id}`, { withCredentials: true });
 };
